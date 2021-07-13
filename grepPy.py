@@ -8,8 +8,12 @@ class GrepPY:
 
     def __init__(self, sourcePath: str) -> None:
         # import glob
-
+        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "], [" Matteo Tenti "]]
         self.filename = os.path.join(os.getcwd(), sourcePath)
+
+        self.uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
+        self.cnRegex = '(?<=cn:)(.*)(?=mail:)'
+        self.mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
         # print(self.fileList)
 
     def load(self) -> None:
@@ -26,16 +30,19 @@ class GrepPY:
 
         for entry in range(len(self.db)):
 
-            uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
-            self.uids.append(re.findall(uidRegex, self.db[entry]))
+            if re.findall(self.cnRegex, self.db[entry]) in self.USList:
+                pass
+            else:
+                #uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
+                self.uids.append(re.findall(self.uidRegex, self.db[entry]))
 
-            cnRegex = '(?<=cn:)(.*)(?=mail:)'
-            self.cns.append(re.findall(cnRegex, self.db[entry]))
+                #cnRegex = '(?<=cn:)(.*)(?=mail:)'
+                self.cns.append(re.findall(self.cnRegex, self.db[entry]))
 
-            mailRegex = "(^[a-zA-Z0-9_.+-].[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"#"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
-            self.mails.append(re.findall(mailRegex, self.db[entry]))
+                #mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+                self.mails.append(re.findall(self.mailRegex, self.db[entry]))
 
-        print(self.uids)
+        #print(self.uids)
         # print(self.cns)
         # print(self.mails)
 
@@ -62,7 +69,7 @@ class GrepPY:
 
         data = {"uid":self.UIDS, "cn":self.CNS, "mail":self.MAILS}
         database = pd.DataFrame(data)
-        database.to_csv(destName, sep=separator)
+        database.to_csv(destName, sep=separator, index=False)
 
 
 class BatchGrepPY(GrepPY):
@@ -89,7 +96,7 @@ class BatchGrepPY(GrepPY):
             cnRegex = '(?<=cn:)(.*)(?=mail:)'
             self.cns.append(re.findall(cnRegex, self.db[entry]))
 
-            mailRegex = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+            mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
             self.mails.append(re.findall(mailRegex, self.db[entry]))
 
 
