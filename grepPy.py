@@ -75,6 +75,11 @@ class GrepPY:
 class BatchGrepPY(GrepPY):
 
     def __init__(self):
+        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "], [" Matteo Tenti "]]
+        self.uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
+        self.cnRegex = '(?<=cn:)(.*)(?=mail:)'
+        self.mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+
         pass
 
     def load(self, fileName:str): # -> database:
@@ -90,14 +95,17 @@ class BatchGrepPY(GrepPY):
 
         for entry in range(len(self.db)):
 
-            uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
-            self.uids.append(re.findall(uidRegex, self.db[entry]))
+            if re.findall(self.cnRegex, self.db[entry]) in self.USList:
+                pass
+            else:
+                #uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
+                self.uids.append(re.findall(self.uidRegex, self.db[entry]))
 
-            cnRegex = '(?<=cn:)(.*)(?=mail:)'
-            self.cns.append(re.findall(cnRegex, self.db[entry]))
+                #cnRegex = '(?<=cn:)(.*)(?=mail:)'
+                self.cns.append(re.findall(self.cnRegex, self.db[entry]))
 
-            mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
-            self.mails.append(re.findall(mailRegex, self.db[entry]))
+                #mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+                self.mails.append(re.findall(self.mailRegex, self.db[entry]))
 
 
 
