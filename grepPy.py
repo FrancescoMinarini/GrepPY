@@ -8,7 +8,7 @@ class GrepPY:
 
     def __init__(self, sourcePath: str) -> None:
         # import glob
-        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "], [" Matteo Tenti "]]
+        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "]]
         self.filename = os.path.join(os.getcwd(), sourcePath)
 
         self.uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
@@ -75,7 +75,7 @@ class GrepPY:
 class BatchGrepPY(GrepPY):
 
     def __init__(self):
-        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "], [" Matteo Tenti "]]
+        self.USList = [[" Andrea Rendina "], [" Antonio Falabella "], [" Federico Fornari "], [" Lucia Morganti "], [" Daniele Cesini "],[" Carmelo Pellegrino "], [" Vincenzo Rega "], [" Claudia Cavallaro "], [" Daniele Lattanzio "], [" Francesco Minarini "], [" Elena Corni "], [" Federico Versari "]]
         self.uidRegex = '(?<=uid:)\s[a-z.A-Z0-9]+\s'
         self.cnRegex = '(?<=cn:)(.*)(?=mail:)'
         self.mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
@@ -107,7 +107,30 @@ class BatchGrepPY(GrepPY):
                 #mailRegex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
                 self.mails.append(re.findall(self.mailRegex, self.db[entry]))
 
+    def to_Batch_CSV(self, destName: str, separator: str):
+        # import pandas as pd
 
+        self.UIDS = []
+        self.CNS = []
+        self.MAILS = []
+
+        for index in range(0, len(self.db)):
+            try:
+                self.UIDS.append(self.uids[index][0])
+            except IndexError:
+                self.UIDS.append("N/A")
+            try:
+                self.CNS.append(self.cns[index][0])
+            except IndexError:
+                self.CNS.append("N/A")
+            try:
+                self.MAILS.append(self.mails[index][0])
+            except IndexError:
+                self.MAILS.append("N/A")
+
+        data = {"uid":self.UIDS, "cn":self.CNS, "mail":self.MAILS}
+        database = pd.DataFrame(data)
+        database.to_csv(destName, sep=separator, index=False)
 
 print("choose your option:\n")
 print("1 Process a single file\n")
@@ -129,6 +152,7 @@ else:
     dst = input("specify destination folder:")
 
     fileList = os.listdir(os.getcwd()+"/prova")
+    print(fileList)
     #finalFolder = os.path.join(os.getcwd(), "prova/outputbatch")
 
     if not os.path.exists(dst):
@@ -141,9 +165,10 @@ else:
 
     BatchGrep = BatchGrepPY()
     for file in fileList:
-        try:
+        if os.path.isdir("prova/"+str(file)):
+            print("skipping sub-directory...")
+        else:
             BatchGrep.load(os.getcwd()+"/prova/"+str(file))
-        except IsADirectoryError:
-            pass
-        BatchGrep.BatchGrep()
-        BatchGrep.to_CSV(destName=dst+"/"+str(file)+".csv", separator=";")
+            BatchGrep.BatchGrep()
+            print("publishing file named: {}".format(file))
+            BatchGrep.to_Batch_CSV(destName=dst+"/"+str(file)+".csv", separator=";")
